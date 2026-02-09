@@ -1,6 +1,5 @@
 name: Build Windows Exe
 
-# 當有代碼 push 到 main 分支時觸發
 on:
   push:
     branches: [ "main" ]
@@ -8,38 +7,29 @@ on:
 
 jobs:
   build:
-    # 指定使用最新的 Windows 環境執行
     runs-on: windows-latest
 
     steps:
-    # 1. 下載您的程式碼
     - uses: actions/checkout@v4
 
-    # 2. 設定 Python 環境 (建議用 3.10 較穩定)
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        cache: 'pip'
+        cache: 'pip' # 這裡現在會去讀取 requirements.txt，不會報錯了
 
-    # 3. 安裝依賴庫
-    # 這裡直接列出需要的庫，不需要 requirements.txt 也可以
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install pandas yfinance pyinstaller
+        pip install -r requirements.txt
 
-    # 4. 執行 PyInstaller 打包指令
-    # --onefile: 單一檔案
-    # --noconsole: 執行時不顯示黑窗
-    # --clean: 清除快取
     - name: Build EXE
+      # 注意：這裡假設您的主程式檔名是 stock_gui.py
+      # 如果您沒改檔名，請把下方的 stock_gui.py 改成 stock_downloader.py
       run: |
-        pyinstaller --onefile --noconsole --clean --name "StockGrabber" stock_gui.py
+        pyinstaller --onefile --noconsole --clean --name "TaiwanStockGrabber" stock_downloader.py
 
-    # 5. 上傳打包好的 EXE 讓使用者下載
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: StockGrabber-Windows-Exe
-        path: dist/StockGrabber.exe
+        name: TaiwanStockGrabber-Windows-Exe
+        path: dist/TaiwanStockGrabber.exe
